@@ -1,0 +1,421 @@
+<!-- file: payment-reminder-page.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Payment Reminder</title>
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --text: #111827;
+      --border: #e5e7eb;
+      --primary: #0b5fff;
+      --warn: #b45309;
+      --danger: #b91c1c;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1020 0%, #111b35 100%);
+      color: #fff;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .brand {
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+    .lang {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #dbe7ff;
+    }
+    select {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+    }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      color: var(--text);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+    .card .hd {
+      padding: 18px 18px 0;
+    }
+    .card .bd {
+      padding: 18px;
+    }
+    .title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: -0.2px;
+    }
+    .sub {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .pill {
+      display: inline-block;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: #111827;
+      background: #f3f4f6;
+      margin-top: 10px;
+    }
+    .kv {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px 12px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .k { color: var(--muted); }
+    .v { color: var(--text); font-weight: 600; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      line-height: 1;
+    }
+    .btn.primary { background: var(--primary); color: #fff; }
+    .btn.ghost { background: #f3f4f6; color: #111827; border: 1px solid var(--border); }
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .alert {
+      border-left: 4px solid var(--warn);
+      background: #fffbeb;
+      border-radius: 12px;
+      padding: 12px 12px;
+      color: #111827;
+      margin-top: 12px;
+      border: 1px solid #fde68a;
+    }
+    .alert strong { color: #92400e; }
+    .sideblock {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    a { color: inherit; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar" role="banner">
+      <div class="brand" id="brandName">ISP Billing</div>
+      <div class="lang">
+        <label for="langSelect" id="langLabel">Language</label>
+        <select id="langSelect" aria-label="Language">
+          <option value="en-US" selected>English (US)</option>
+          <option value="fil-PH">Filipino</option>
+          <option value="es-ES">Español</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid" role="main">
+      <section class="card" aria-labelledby="pageTitle">
+        <div class="hd">
+          <h1 class="title" id="pageTitle">Payment Reminder</h1>
+          <p class="sub" id="pageSubtitle">
+            Please review your balance and pay online to avoid service interruption.
+          </p>
+          <div class="pill" id="accountPill">Account: —</div>
+        </div>
+
+        <div class="bd">
+          <div class="alert" id="statusAlert" role="status" aria-live="polite" style="display:none;"></div>
+
+          <div class="kv" aria-label="Invoice details">
+            <div class="k" id="kClient">Client</div><div class="v" id="vClient">—</div>
+            <div class="k" id="kPeriod">Billing period</div><div class="v" id="vPeriod">—</div>
+            <div class="k" id="kAmount">Amount due</div><div class="v" id="vAmount">—</div>
+            <div class="k" id="kDue">Due date</div><div class="v" id="vDue">—</div>
+            <div class="k" id="kGrace">Grace ends</div><div class="v" id="vGrace">—</div>
+            <div class="k" id="kInvoice">Invoice</div><div class="v" id="vInvoice">—</div>
+          </div>
+
+          <div class="actions">
+            <a class="btn primary" id="payBtn" href="#" rel="noopener">Pay now</a>
+            <a class="btn ghost" id="invoiceBtn" href="#" rel="noopener">Download invoice (PDF)</a>
+            <button class="btn ghost" id="copyBtn" type="button">Copy account ID</button>
+          </div>
+
+          <p class="note" id="footNote">
+            If you already paid, please allow time for payment posting. If your service is restricted, paying will restore access after confirmation.
+          </p>
+
+          <div class="sideblock">
+            <div class="small" id="supportBlock">
+              Support: <span id="supportEmail">cj@wirless.com</span> · <span id="supportPhone">+63 9123456789</span><br>
+              Hours: <span id="supportHours">Mon–Sat 9:00–18:00</span>
+            </div>
+            <div class="small" style="margin-top:10px;">
+              <a id="privacyLink" href="#" rel="noopener">Privacy</a> ·
+              <a id="prefsLink" href="#" rel="noopener">Notification preferences</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card" aria-label="What happens next">
+        <div class="bd">
+          <h2 class="title" style="font-size:18px; margin:0;">What happens next</h2>
+          <p class="sub" style="margin-top:10px;">
+            Typical steps after the due date:
+          </p>
+          <div class="kv" style="grid-template-columns: 1fr; margin-top:10px;">
+            <div class="small">• Before grace ends: reminders continue, service may remain active or be partially restricted.</div>
+            <div class="small">• After grace ends: service may be redirected to a payment page or temporarily suspended.</div>
+            <div class="small">• After payment confirmation: service is restored (sometimes requires reconnect).</div>
+          </div>
+          <p class="small" style="margin-top:12px;">
+            For security, do not share this page link. This link may expire.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Replace this object server-side, OR load it from your API after validating a token.
+    // IMPORTANT: Keep PII minimal if rendering from a public token.
+    const SAMPLE_DATA = {
+      ispName: "CJ WIRELESS INTERNET SERVICES",
+      clientName: "Alex Dela Cruz",
+      accountId: "PPPOE-ACCT-104928",
+      billingPeriodStart: "2026-02-01",
+      billingPeriodEnd: "2026-02-29",
+      amountDue: 1499.00,
+      currency: "PHP",
+      dueDate: "2026-02-20",
+      graceEnds: "2026-02-25",
+      invoiceNumber: "INV-2026-02-00921",
+      paymentLink: "https://pay.example.net/pay?token={{TOKEN}}",
+      invoicePdfLink: "https://pay.example.net/invoice/INV-2026-02-00921.pdf?token={{TOKEN}}",
+      supportEmail: "support@example.net",
+      supportPhone: "+63 2 8123 4567",
+      supportHours: "Mon–Sat 09:00–18:00 (PH)",
+      privacyLink: "https://example.net/privacy",
+      preferencesLink: "https://example.net/preferences?account=PPPOE-ACCT-104928"
+    };
+
+    const I18N = {
+      "en-US": {
+        pageTitle: "Payment Reminder",
+        pageSubtitle: "Please review your balance and pay online to avoid service interruption.",
+        accountLabel: "Account",
+        kClient: "Client",
+        kPeriod: "Billing period",
+        kAmount: "Amount due",
+        kDue: "Due date",
+        kGrace: "Grace ends",
+        kInvoice: "Invoice",
+        payNow: "Pay now",
+        downloadInvoice: "Download invoice (PDF)",
+        copyAccount: "Copy account ID",
+        copied: "Copied!",
+        privacy: "Privacy",
+        prefs: "Notification preferences"
+      },
+      "fil-PH": {
+        pageTitle: "Paalaala sa Bayad",
+        pageSubtitle: "Pakisuri ang balanse at magbayad online upang maiwasan ang pagkaantala ng serbisyo.",
+        accountLabel: "Account",
+        kClient: "Kliyente",
+        kPeriod: "Panahon ng singil",
+        kAmount: "Halagang dapat bayaran",
+        kDue: "Petsa ng bayaran",
+        kGrace: "Hanggang kailan ang palugit",
+        kInvoice: "Resibo / Invoice",
+        payNow: "Magbayad ngayon",
+        downloadInvoice: "I-download ang invoice (PDF)",
+        copyAccount: "Kopyahin ang account ID",
+        copied: "Nakopya!",
+        privacy: "Privacy",
+        prefs: "Mga abiso"
+      },
+      "es-ES": {
+        pageTitle: "Recordatorio de Pago",
+        pageSubtitle: "Revisa tu saldo y paga en línea para evitar interrupciones del servicio.",
+        accountLabel: "Cuenta",
+        kClient: "Cliente",
+        kPeriod: "Periodo de facturación",
+        kAmount: "Importe adeudado",
+        kDue: "Fecha de vencimiento",
+        kGrace: "Fin de gracia",
+        kInvoice: "Factura",
+        payNow: "Pagar ahora",
+        downloadInvoice: "Descargar factura (PDF)",
+        copyAccount: "Copiar ID de cuenta",
+        copied: "¡Copiado!",
+        privacy: "Privacidad",
+        prefs: "Preferencias"
+      }
+    };
+
+    function fmtMoney(amount, currency, locale) {
+      try {
+        return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
+      } catch {
+        return currency + " " + amount.toFixed(2);
+      }
+    }
+
+    function fmtDate(isoDate, locale) {
+      try {
+        return new Intl.DateTimeFormat(locale, { year: "numeric", month: "short", day: "2-digit" }).format(new Date(isoDate + "T00:00:00"));
+      } catch {
+        return isoDate;
+      }
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function applyData(data, locale) {
+      setText("brandName", data.ispName + " Billing");
+      setText("accountPill", (I18N[locale].accountLabel || "Account") + ": " + data.accountId);
+
+      setText("vClient", data.clientName);
+      setText("vPeriod", fmtDate(data.billingPeriodStart, locale) + " – " + fmtDate(data.billingPeriodEnd, locale));
+      setText("vAmount", fmtMoney(data.amountDue, data.currency, locale));
+      setText("vDue", fmtDate(data.dueDate, locale));
+      setText("vGrace", fmtDate(data.graceEnds, locale));
+      setText("vInvoice", data.invoiceNumber);
+
+      document.getElementById("payBtn").href = data.paymentLink;
+      document.getElementById("invoiceBtn").href = data.invoicePdfLink;
+
+      setText("supportEmail", data.supportEmail);
+      setText("supportPhone", data.supportPhone);
+      setText("supportHours", data.supportHours);
+      document.getElementById("privacyLink").href = data.privacyLink;
+      document.getElementById("prefsLink").href = data.preferencesLink;
+
+      // Optional status banner if overdue / near grace end (sample rule)
+      const today = new Date();
+      const due = new Date(data.dueDate + "T00:00:00");
+      const grace = new Date(data.graceEnds + "T00:00:00");
+      const alert = document.getElementById("statusAlert");
+
+      if (today > grace) {
+        alert.style.display = "block";
+        alert.innerHTML = "<strong>Service may be restricted.</strong> Your grace period has ended. Please pay to restore access.";
+      } else if (today > due) {
+        alert.style.display = "block";
+        alert.innerHTML = "<strong>Overdue.</strong> Please pay before the grace period ends to avoid restriction.";
+      } else {
+        alert.style.display = "none";
+      }
+    }
+
+    function applyLanguage(locale) {
+      const t = I18N[locale] || I18N["en-US"];
+      setText("pageTitle", t.pageTitle);
+      setText("pageSubtitle", t.pageSubtitle);
+      setText("langLabel", "Language");
+      setText("kClient", t.kClient);
+      setText("kPeriod", t.kPeriod);
+      setText("kAmount", t.kAmount);
+      setText("kDue", t.kDue);
+      setText("kGrace", t.kGrace);
+      setText("kInvoice", t.kInvoice);
+
+      setText("payBtn", t.payNow);
+      setText("invoiceBtn", t.downloadInvoice);
+      setText("copyBtn", t.copyAccount);
+      setText("privacyLink", t.privacy);
+      setText("prefsLink", t.prefs);
+    }
+
+    (function init() {
+      const sel = document.getElementById("langSelect");
+      let locale = sel.value || "en-US";
+
+      applyLanguage(locale);
+      applyData(SAMPLE_DATA, locale);
+
+      sel.addEventListener("change", () => {
+        locale = sel.value;
+        document.documentElement.lang = locale;
+        applyLanguage(locale);
+        applyData(SAMPLE_DATA, locale);
+      });
+
+      document.getElementById("copyBtn").addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(SAMPLE_DATA.accountId);
+          document.getElementById("copyBtn").textContent = (I18N[locale].copied || "Copied!");
+          setTimeout(() => { document.getElementById("copyBtn").textContent = (I18N[locale].copyAccount || "Copy account ID"); }, 1200);
+        } catch {
+          // Fallback: do nothing
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
